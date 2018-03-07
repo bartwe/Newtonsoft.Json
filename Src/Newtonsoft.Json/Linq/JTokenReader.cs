@@ -74,14 +74,6 @@ namespace Newtonsoft.Json.Linq
             return ReadAsBytesInternal();
         }
 
-        /// <summary>
-        /// Reads the next JSON token from the stream as a <see cref="Nullable{Decimal}"/>.
-        /// </summary>
-        /// <returns>A <see cref="Nullable{Decimal}"/>. This method will return <c>null</c> at the end of an array.</returns>
-        public override decimal? ReadAsDecimal()
-        {
-            return ReadAsDecimalInternal();
-        }
 
         /// <summary>
         /// Reads the next JSON token from the stream as a <see cref="Nullable{Int32}"/>.
@@ -250,16 +242,16 @@ namespace Newtonsoft.Json.Linq
                     SetToken(JsonToken.Comment, ((JValue)token).Value);
                     break;
                 case JTokenType.Integer:
-                    SetToken(JsonToken.Integer, ((JValue)token).Value);
+                    SetIntToken((long)((JValue)token).Value);
                     break;
                 case JTokenType.Float:
-                    SetToken(JsonToken.Float, ((JValue)token).Value);
+                    SetFloatToken((double)((JValue)token).Value);
                     break;
                 case JTokenType.String:
                     SetToken(JsonToken.String, ((JValue)token).Value);
                     break;
                 case JTokenType.Boolean:
-                    SetToken(JsonToken.Boolean, ((JValue)token).Value);
+                    SetBoolToken((bool)((JValue)token).Value);
                     break;
                 case JTokenType.Null:
                     SetToken(JsonToken.Null, ((JValue)token).Value);

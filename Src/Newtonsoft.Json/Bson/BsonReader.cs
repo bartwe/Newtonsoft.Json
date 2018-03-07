@@ -186,15 +186,6 @@ namespace Newtonsoft.Json.Bson
         }
 
         /// <summary>
-        /// Reads the next JSON token from the stream as a <see cref="Nullable{Decimal}"/>.
-        /// </summary>
-        /// <returns>A <see cref="Nullable{Decimal}"/>. This method will return <c>null</c> at the end of an array.</returns>
-        public override decimal? ReadAsDecimal()
-        {
-            return ReadAsDecimalInternal();
-        }
-
-        /// <summary>
         /// Reads the next JSON token from the stream as a <see cref="Nullable{Int32}"/>.
         /// </summary>
         /// <returns>A <see cref="Nullable{Int32}"/>. This method will return <c>null</c> at the end of an array.</returns>
@@ -507,11 +498,7 @@ namespace Newtonsoft.Json.Bson
             {
                 case BsonType.Number:
                     double d = ReadDouble();
-
-                    if (_floatParseHandling == FloatParseHandling.Decimal)
-                        SetToken(JsonToken.Float, Convert.ToDecimal(d, CultureInfo.InvariantCulture));
-                    else
-                        SetToken(JsonToken.Float, d);
+                    SetFloatToken(d);
                     break;
                 case BsonType.String:
                 case BsonType.Symbol:
@@ -554,7 +541,7 @@ namespace Newtonsoft.Json.Bson
                     break;
                 case BsonType.Boolean:
                     bool b = Convert.ToBoolean(ReadByte());
-                    SetToken(JsonToken.Boolean, b);
+                    SetBoolToken(b);
                     break;
                 case BsonType.Date:
                     long ticks = ReadInt64();
@@ -598,11 +585,11 @@ namespace Newtonsoft.Json.Bson
                     _bsonReaderState = BsonReaderState.CodeWScopeStart;
                     break;
                 case BsonType.Integer:
-                    SetToken(JsonToken.Integer, (long)ReadInt32());
+                    SetIntToken((long)ReadInt32());
                     break;
                 case BsonType.TimeStamp:
                 case BsonType.Long:
-                    SetToken(JsonToken.Integer, ReadInt64());
+                    SetIntToken(ReadInt64());
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("type", "Unexpected BsonType value: " + type);

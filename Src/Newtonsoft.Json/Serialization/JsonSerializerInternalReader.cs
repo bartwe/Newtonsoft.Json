@@ -393,7 +393,6 @@ namespace Newtonsoft.Json.Serialization
                     tokenReader.DateFormatString = reader.DateFormatString;
                     tokenReader.DateParseHandling = reader.DateParseHandling;
                     tokenReader.DateTimeZoneHandling = reader.DateTimeZoneHandling;
-                    tokenReader.FloatParseHandling = reader.FloatParseHandling;
                     tokenReader.SupportMultipleContent = reader.SupportMultipleContent;
 
                     // start
@@ -1892,9 +1891,6 @@ namespace Newtonsoft.Json.Serialization
                     return true;
                 case ReadType.ReadAsInt32:
                     reader.ReadAsInt32();
-                    break;
-                case ReadType.ReadAsDecimal:
-                    reader.ReadAsDecimal();
                     break;
                 case ReadType.ReadAsBytes:
                     reader.ReadAsBytes();

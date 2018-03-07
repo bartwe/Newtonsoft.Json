@@ -126,9 +126,12 @@ namespace Newtonsoft.Json
         private int? _maxDepth;
         private bool _hasExceededMaxDepth;
         internal DateParseHandling _dateParseHandling;
-        internal FloatParseHandling _floatParseHandling;
         private string _dateFormatString;
         private readonly List<JsonPosition> _stack;
+
+        private long _intValue;
+        private double _floatValue;
+        private bool _boolValue;
 
         /// <summary>
         /// Gets the current reader state.
@@ -186,15 +189,6 @@ namespace Newtonsoft.Json
         }
 
         /// <summary>
-        /// Get or set how floating point numbers, e.g. 1.0 and 9.9, are parsed when reading JSON text.
-        /// </summary>
-        public FloatParseHandling FloatParseHandling
-        {
-            get { return _floatParseHandling; }
-            set { _floatParseHandling = value; }
-        }
-
-        /// <summary>
         /// Get or set how custom date formatted strings are parsed when reading JSON.
         /// </summary>
         public string DateFormatString
@@ -231,7 +225,50 @@ namespace Newtonsoft.Json
         /// </summary>
         public virtual object Value
         {
-            get { return _value; }
+            get { 
+                ConvertValueToObject();
+                return _value;
+            }
+        }
+
+        public virtual long IntValue {
+            get {
+                if (TokenType == JsonToken.Integer)
+                    return _intValue;
+                return (long)Value;
+            }
+        }
+
+        public virtual double FloatValue {
+            get {
+                if (TokenType == JsonToken.Float)
+                    return _floatValue;
+                return (double)Value;
+            }
+        }
+
+        public virtual bool BoolValue {
+            get {
+                if (TokenType == JsonToken.Boolean)
+                    return _boolValue;
+                return (bool)Value;
+            }
+        }
+
+        void ConvertValueToObject() {
+            if (_value != null)
+                return;
+            switch (_tokenType) {
+                case JsonToken.Integer:
+                    _value = _intValue;
+                    break;
+                case JsonToken.Float:
+                    _value = _floatValue;
+                    break;
+                case JsonToken.Boolean:
+                    _value = _boolValue;
+                    break;
+            }
         }
 
         /// <summary>
@@ -239,7 +276,10 @@ namespace Newtonsoft.Json
         /// </summary>
         public virtual Type ValueType
         {
-            get { return (_value != null) ? _value.GetType() : null; }
+            get {
+                var value = Value;
+                return (value != null) ? value.GetType() : null; 
+            }
         }
 
         /// <summary>
@@ -306,7 +346,6 @@ namespace Newtonsoft.Json
             _stack = new List<JsonPosition>(4);
             _dateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind;
             _dateParseHandling = DateParseHandling.DateTime;
-            _floatParseHandling = FloatParseHandling.Double;
 
             CloseInput = true;
         }
@@ -382,12 +421,6 @@ namespace Newtonsoft.Json
         /// </summary>
         /// <returns>A <see cref="Byte"/>[] or a null reference if the next JSON token is null. This method will return <c>null</c> at the end of an array.</returns>
         public abstract byte[] ReadAsBytes();
-
-        /// <summary>
-        /// Reads the next JSON token from the stream as a <see cref="Nullable{Decimal}"/>.
-        /// </summary>
-        /// <returns>A <see cref="Nullable{Decimal}"/>. This method will return <c>null</c> at the end of an array.</returns>
-        public abstract decimal? ReadAsDecimal();
 
         /// <summary>
         /// Reads the next JSON token from the stream as a <see cref="Nullable{DateTime}"/>.
@@ -574,63 +607,6 @@ namespace Newtonsoft.Json
             throw JsonReaderException.Create(this, "Error reading bytes. Unexpected token: {0}.".FormatWith(CultureInfo.InvariantCulture, t));
         }
 
-        internal decimal? ReadAsDecimalInternal()
-        {
-            _readType = ReadType.ReadAsDecimal;
-
-            JsonToken t;
-
-            do
-            {
-                if (!ReadInternal())
-                {
-                    SetToken(JsonToken.None);
-                    return null;
-                }
-                else
-                {
-                    t = TokenType;
-                }
-            } while (t == JsonToken.Comment);
-
-            if (t == JsonToken.Integer || t == JsonToken.Float)
-            {
-                if (!(Value is decimal))
-                    SetToken(JsonToken.Float, Convert.ToDecimal(Value, CultureInfo.InvariantCulture), false);
-
-                return (decimal)Value;
-            }
-
-            if (t == JsonToken.Null)
-                return null;
-
-            if (t == JsonToken.String)
-            {
-                string s = (string)Value;
-                if (string.IsNullOrEmpty(s))
-                {
-                    SetToken(JsonToken.Null);
-                    return null;
-                }
-
-                decimal d;
-                if (decimal.TryParse(s, NumberStyles.Number, Culture, out d))
-                {
-                    SetToken(JsonToken.Float, d, false);
-                    return d;
-                }
-                else
-                {
-                    throw JsonReaderException.Create(this, "Could not convert string to decimal: {0}.".FormatWith(CultureInfo.InvariantCulture, Value));
-                }
-            }
-
-            if (t == JsonToken.EndArray)
-                return null;
-
-            throw JsonReaderException.Create(this, "Error reading decimal. Unexpected token: {0}.".FormatWith(CultureInfo.InvariantCulture, t));
-        }
-
         internal int? ReadAsInt32Internal()
         {
             _readType = ReadType.ReadAsInt32;
@@ -652,10 +628,10 @@ namespace Newtonsoft.Json
 
             if (t == JsonToken.Integer || t == JsonToken.Float)
             {
-                if (!(Value is int))
-                    SetToken(JsonToken.Integer, Convert.ToInt32(Value, CultureInfo.InvariantCulture), false);
+                if (!(Value is long))
+                    SetIntToken(Convert.ToInt64(Value, CultureInfo.InvariantCulture), false);
 
-                return (int)Value;
+                return (int)(long)Value;
             }
 
             if (t == JsonToken.Null)
@@ -673,7 +649,7 @@ namespace Newtonsoft.Json
 
                 if (int.TryParse(s, NumberStyles.Integer, Culture, out i))
                 {
-                    SetToken(JsonToken.Integer, i, false);
+                    SetIntToken(i, false);
                     return i;
                 }
                 else
@@ -841,6 +817,27 @@ namespace Newtonsoft.Json
         protected void SetToken(JsonToken newToken)
         {
             SetToken(newToken, null, true);
+        }
+
+        internal void SetBoolToken(bool value, bool updateIndex = true) {
+            _tokenType = JsonToken.Boolean;
+            _value = null;
+            _boolValue = value;
+            SetPostValueState(updateIndex);
+        }
+
+        internal void SetIntToken(long value, bool updateIndex = true) {
+            _tokenType = JsonToken.Integer;
+            _value = null;
+            _intValue = value;
+            SetPostValueState(updateIndex);
+        }
+
+        internal void SetFloatToken(double value, bool updateIndex = true) {
+            _tokenType = JsonToken.Float;
+            _value = null;
+            _floatValue = value;
+            SetPostValueState(updateIndex);
         }
 
         /// <summary>

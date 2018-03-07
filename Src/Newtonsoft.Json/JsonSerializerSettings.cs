@@ -54,7 +54,6 @@ namespace Newtonsoft.Json
         internal const DateFormatHandling DefaultDateFormatHandling = DateFormatHandling.IsoDateFormat;
         internal const DateTimeZoneHandling DefaultDateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind;
         internal const DateParseHandling DefaultDateParseHandling = DateParseHandling.DateTime;
-        internal const FloatParseHandling DefaultFloatParseHandling = FloatParseHandling.Double;
         internal const FloatFormatHandling DefaultFloatFormatHandling = FloatFormatHandling.String;
         internal const StringEscapeHandling DefaultStringEscapeHandling = StringEscapeHandling.Default;
         internal const FormatterAssemblyStyle DefaultFormatterAssemblyStyle = FormatterAssemblyStyle.Simple;
@@ -67,7 +66,6 @@ namespace Newtonsoft.Json
         internal DateTimeZoneHandling? _dateTimeZoneHandling;
         internal DateParseHandling? _dateParseHandling;
         internal FloatFormatHandling? _floatFormatHandling;
-        internal FloatParseHandling? _floatParseHandling;
         internal StringEscapeHandling? _stringEscapeHandling;
         internal CultureInfo _culture;
         internal bool? _checkAdditionalContent;
@@ -330,15 +328,6 @@ namespace Newtonsoft.Json
         {
             get { return _floatFormatHandling ?? DefaultFloatFormatHandling; }
             set { _floatFormatHandling = value; }
-        }
-
-        /// <summary>
-        /// Get or set how floating point numbers, e.g. 1.0 and 9.9, are parsed when reading JSON text.
-        /// </summary>
-        public FloatParseHandling FloatParseHandling
-        {
-            get { return _floatParseHandling ?? DefaultFloatParseHandling; }
-            set { _floatParseHandling = value; }
         }
 
         /// <summary>

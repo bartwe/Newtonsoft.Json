@@ -391,18 +391,6 @@ namespace Newtonsoft.Json
         }
 
         /// <summary>
-        /// Reads the next JSON token from the stream as a <see cref="Nullable{Decimal}"/>.
-        /// </summary>
-        /// <returns>A <see cref="Nullable{Decimal}"/>.</returns>
-        public override decimal? ReadAsDecimal()
-        {
-            decimal? d = _reader.ReadAsDecimal();
-
-            ValidateCurrentToken();
-            return d;
-        }
-
-        /// <summary>
         /// Reads the next JSON token from the stream as a <see cref="String"/>.
         /// </summary>
         /// <returns>A <see cref="String"/>. This method will return <c>null</c> at the end of an array.</returns>

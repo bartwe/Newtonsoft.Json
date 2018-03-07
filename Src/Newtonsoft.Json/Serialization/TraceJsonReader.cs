@@ -57,13 +57,6 @@ namespace Newtonsoft.Json.Serialization
             return value;
         }
 
-        public override decimal? ReadAsDecimal()
-        {
-            var value = _innerReader.ReadAsDecimal();
-            _textWriter.WriteToken(_innerReader, false, false);
-            return value;
-        }
-
         public override DateTime? ReadAsDateTime()
         {
             var value = _innerReader.ReadAsDateTime();

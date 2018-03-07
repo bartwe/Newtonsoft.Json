@@ -67,7 +67,6 @@ namespace Newtonsoft.Json
         private DateTimeZoneHandling? _dateTimeZoneHandling;
         private DateParseHandling? _dateParseHandling;
         private FloatFormatHandling? _floatFormatHandling;
-        private FloatParseHandling? _floatParseHandling;
         private StringEscapeHandling? _stringEscapeHandling;
         private CultureInfo _culture;
         private int? _maxDepth;
@@ -357,15 +356,6 @@ namespace Newtonsoft.Json
         }
 
         /// <summary>
-        /// Get or set how floating point numbers, e.g. 1.0 and 9.9, are parsed when reading JSON text.
-        /// </summary>
-        public virtual FloatParseHandling FloatParseHandling
-        {
-            get { return _floatParseHandling ?? JsonSerializerSettings.DefaultFloatParseHandling; }
-            set { _floatParseHandling = value; }
-        }
-
-        /// <summary>
         /// Get or set how special floating point numbers, e.g. <see cref="F:System.Double.NaN"/>,
         /// <see cref="F:System.Double.PositiveInfinity"/> and <see cref="F:System.Double.NegativeInfinity"/>,
         /// are written as JSON text.
@@ -597,8 +587,6 @@ namespace Newtonsoft.Json
             }
             if (settings._floatFormatHandling != null)
                 serializer._floatFormatHandling = settings._floatFormatHandling;
-            if (settings._floatParseHandling != null)
-                serializer._floatParseHandling = settings._floatParseHandling;
             if (settings._stringEscapeHandling != null)
                 serializer._stringEscapeHandling = settings._stringEscapeHandling;
             if (settings._culture != null)
@@ -639,10 +627,9 @@ namespace Newtonsoft.Json
             CultureInfo previousCulture;
             DateTimeZoneHandling? previousDateTimeZoneHandling;
             DateParseHandling? previousDateParseHandling;
-            FloatParseHandling? previousFloatParseHandling;
             int? previousMaxDepth;
             string previousDateFormatString;
-            SetupReader(reader, out previousCulture, out previousDateTimeZoneHandling, out previousDateParseHandling, out previousFloatParseHandling, out previousMaxDepth, out previousDateFormatString);
+            SetupReader(reader, out previousCulture, out previousDateTimeZoneHandling, out previousDateParseHandling, out previousMaxDepth, out previousDateFormatString);
 
             TraceJsonReader traceJsonReader = (TraceWriter != null && TraceWriter.LevelFilter >= TraceLevel.Verbose)
                 ? new TraceJsonReader(reader)
@@ -654,7 +641,7 @@ namespace Newtonsoft.Json
             if (traceJsonReader != null)
                 TraceWriter.Trace(TraceLevel.Verbose, traceJsonReader.GetDeserializedJsonMessage(), null);
 
-            ResetReader(reader, previousCulture, previousDateTimeZoneHandling, previousDateParseHandling, previousFloatParseHandling, previousMaxDepth, previousDateFormatString);
+            ResetReader(reader, previousCulture, previousDateTimeZoneHandling, previousDateParseHandling, previousMaxDepth, previousDateFormatString);
         }
 
         /// <summary>
@@ -711,10 +698,9 @@ namespace Newtonsoft.Json
             CultureInfo previousCulture;
             DateTimeZoneHandling? previousDateTimeZoneHandling;
             DateParseHandling? previousDateParseHandling;
-            FloatParseHandling? previousFloatParseHandling;
             int? previousMaxDepth;
             string previousDateFormatString;
-            SetupReader(reader, out previousCulture, out previousDateTimeZoneHandling, out previousDateParseHandling, out previousFloatParseHandling, out previousMaxDepth, out previousDateFormatString);
+            SetupReader(reader, out previousCulture, out previousDateTimeZoneHandling, out previousDateParseHandling, out previousMaxDepth, out previousDateFormatString);
 
             TraceJsonReader traceJsonReader = (TraceWriter != null && TraceWriter.LevelFilter >= TraceLevel.Verbose)
                 ? new TraceJsonReader(reader)
@@ -726,12 +712,12 @@ namespace Newtonsoft.Json
             if (traceJsonReader != null)
                 TraceWriter.Trace(TraceLevel.Verbose, traceJsonReader.GetDeserializedJsonMessage(), null);
 
-            ResetReader(reader, previousCulture, previousDateTimeZoneHandling, previousDateParseHandling, previousFloatParseHandling, previousMaxDepth, previousDateFormatString);
+            ResetReader(reader, previousCulture, previousDateTimeZoneHandling, previousDateParseHandling, previousMaxDepth, previousDateFormatString);
 
             return value;
         }
 
-        private void SetupReader(JsonReader reader, out CultureInfo previousCulture, out DateTimeZoneHandling? previousDateTimeZoneHandling, out DateParseHandling? previousDateParseHandling, out FloatParseHandling? previousFloatParseHandling, out int? previousMaxDepth, out string previousDateFormatString)
+        private void SetupReader(JsonReader reader, out CultureInfo previousCulture, out DateTimeZoneHandling? previousDateTimeZoneHandling, out DateParseHandling? previousDateParseHandling, out int? previousMaxDepth, out string previousDateFormatString)
         {
             if (_culture != null && !_culture.Equals(reader.Culture))
             {
@@ -763,16 +749,6 @@ namespace Newtonsoft.Json
                 previousDateParseHandling = null;
             }
 
-            if (_floatParseHandling != null && reader.FloatParseHandling != _floatParseHandling)
-            {
-                previousFloatParseHandling = reader.FloatParseHandling;
-                reader.FloatParseHandling = _floatParseHandling.Value;
-            }
-            else
-            {
-                previousFloatParseHandling = null;
-            }
-
             if (_maxDepthSet && reader.MaxDepth != _maxDepth)
             {
                 previousMaxDepth = reader.MaxDepth;
@@ -802,7 +778,7 @@ namespace Newtonsoft.Json
             }
         }
 
-        private void ResetReader(JsonReader reader, CultureInfo previousCulture, DateTimeZoneHandling? previousDateTimeZoneHandling, DateParseHandling? previousDateParseHandling, FloatParseHandling? previousFloatParseHandling, int? previousMaxDepth, string previousDateFormatString)
+        private void ResetReader(JsonReader reader, CultureInfo previousCulture, DateTimeZoneHandling? previousDateTimeZoneHandling, DateParseHandling? previousDateParseHandling, int? previousMaxDepth, string previousDateFormatString)
         {
             // reset reader back to previous options
             if (previousCulture != null)
@@ -811,8 +787,6 @@ namespace Newtonsoft.Json
                 reader.DateTimeZoneHandling = previousDateTimeZoneHandling.Value;
             if (previousDateParseHandling != null)
                 reader.DateParseHandling = previousDateParseHandling.Value;
-            if (previousFloatParseHandling != null)
-                reader.FloatParseHandling = previousFloatParseHandling.Value;
             if (_maxDepthSet)
                 reader.MaxDepth = previousMaxDepth;
             if (_dateFormatStringSet)
