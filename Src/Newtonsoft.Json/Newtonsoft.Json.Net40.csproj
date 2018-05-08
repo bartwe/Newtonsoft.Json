@@ -47,7 +47,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Debug\Net40\</OutputPath>
     <IntermediateOutputPath>obj\Debug\Net40\</IntermediateOutputPath>
     <DefineConstants>TRACE;DEBUG;NET40;CODE_ANALYSIS</DefineConstants>
