@@ -115,7 +115,7 @@ namespace Newtonsoft.Json
         }
 
         // current Token data
-        private JsonToken _tokenType;
+        public JsonToken TokenTypeDirect;
         private object _value;
         internal char _quoteChar;
         internal State _currentState;
@@ -217,7 +217,7 @@ namespace Newtonsoft.Json
         /// </summary>
         public virtual JsonToken TokenType
         {
-            get { return _tokenType; }
+            get { return TokenTypeDirect; }
         }
 
         /// <summary>
@@ -225,9 +225,40 @@ namespace Newtonsoft.Json
         /// </summary>
         public virtual object Value
         {
-            get { 
-                ConvertValueToObject();
+            get {
+                if (_value != null)
+                    return _value;
+                switch (TokenTypeDirect) {
+                    case JsonToken.Integer:
+                        _value = _intValue;
+                        break;
+                    case JsonToken.Float:
+                        _value = _floatValue;
+                        break;
+                    case JsonToken.Boolean:
+                        _value = _boolValue;
+                        break;
+                }
                 return _value;
+            }
+        }
+
+        public string StringValue {
+            get {
+                if (_value != null)
+                    return (string)_value;
+                switch (TokenTypeDirect) {
+                    case JsonToken.Integer:
+                        _value = _intValue;
+                        break;
+                    case JsonToken.Float:
+                        _value = _floatValue;
+                        break;
+                    case JsonToken.Boolean:
+                        _value = _boolValue;
+                        break;
+                }
+                return (string)_value;
             }
         }
 
@@ -252,22 +283,6 @@ namespace Newtonsoft.Json
                 if (TokenType == JsonToken.Boolean)
                     return _boolValue;
                 return (bool)Value;
-            }
-        }
-
-        void ConvertValueToObject() {
-            if (_value != null)
-                return;
-            switch (_tokenType) {
-                case JsonToken.Integer:
-                    _value = _intValue;
-                    break;
-                case JsonToken.Float:
-                    _value = _floatValue;
-                    break;
-                case JsonToken.Boolean:
-                    _value = _boolValue;
-                    break;
             }
         }
 
@@ -820,21 +835,21 @@ namespace Newtonsoft.Json
         }
 
         internal void SetBoolToken(bool value, bool updateIndex = true) {
-            _tokenType = JsonToken.Boolean;
+            TokenTypeDirect = JsonToken.Boolean;
             _value = null;
             _boolValue = value;
             SetPostValueState(updateIndex);
         }
 
         internal void SetIntToken(long value, bool updateIndex = true) {
-            _tokenType = JsonToken.Integer;
+            TokenTypeDirect = JsonToken.Integer;
             _value = null;
             _intValue = value;
             SetPostValueState(updateIndex);
         }
 
         internal void SetFloatToken(double value, bool updateIndex = true) {
-            _tokenType = JsonToken.Float;
+            TokenTypeDirect = JsonToken.Float;
             _value = null;
             _floatValue = value;
             SetPostValueState(updateIndex);
@@ -852,7 +867,7 @@ namespace Newtonsoft.Json
 
         internal void SetToken(JsonToken newToken, object value, bool updateIndex)
         {
-            _tokenType = newToken;
+            TokenTypeDirect = newToken;
             _value = value;
 
             switch (newToken)
@@ -1000,7 +1015,7 @@ namespace Newtonsoft.Json
         public virtual void Close()
         {
             _currentState = State.Closed;
-            _tokenType = JsonToken.None;
+            TokenTypeDirect = JsonToken.None;
             _value = null;
         }
     }
