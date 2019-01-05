@@ -50,7 +50,7 @@
     <Optimize>true</Optimize>
     <OutputPath>bin\Debug\Net40\</OutputPath>
     <IntermediateOutputPath>obj\Debug\Net40\</IntermediateOutputPath>
-    <DefineConstants>TRACE;DEBUG;NET40;CODE_ANALYSIS</DefineConstants>
+    <DefineConstants>NET40</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\Net40\Newtonsoft.Json.xml</DocumentationFile>
