@@ -700,6 +700,8 @@ namespace Newtonsoft.Json
         {
             while (true)
             {
+                if (_charPos >= _chars.Length)
+                    throw JsonReaderException.Create(this, "Unexpected end while parsing object or array.");
                 char currentChar = _chars[_charPos];
 
                 switch (currentChar)
